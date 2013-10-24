@@ -53,6 +53,19 @@ class Allocator {
             return !(lhs == rhs);}
 
     private:
+	
+	
+	int get_int_val(char* ptr)
+	{
+		return *reinterpret_cast<const int*>(ptr);
+	}
+
+	void set_int_val(char* ptr, int a)
+	{
+		int* new_ptr = (int*)(ptr);
+		*new_ptr=a;
+	}
+
         // ----
         // data
         // ----
@@ -91,6 +104,7 @@ class Allocator {
             printf("\n");
             return true;}
 
+
         /**
          * O(1) in space
          * O(1) in time
@@ -127,16 +141,6 @@ class Allocator {
         // --------
 
 
-int get_int_val(char* ptr)
-{
-	return *reinterpret_cast<const int*>(ptr);
-}
-
-void set_int_val(char* ptr, int a)
-{
-	int* new_ptr = (int*)(ptr);
-	*new_ptr=a;
-}
 
         /**
          * O(1) in space
@@ -232,31 +236,31 @@ void set_int_val(char* ptr, int a)
         void deallocate (pointer p, size_type ) {
 
 		//save start position, negate start sentinel
-                int* start = (int*)((char*)(p)-4);
-                assert(*start<0);
-                *start =0-*start;
-                assert(*start>0);
+                char* start = (char*)(p)-4;
+                assert(get_int_val(start)<0);
+                set_int_val(start,0-get_int_val(start));
+                assert(get_int_val(start)>0);
 
 		//save end position, negate end sentinel
-                int* end = (int*)((char*)(p)+*start);
-                assert(*end<0);
-                *end =0-*end;
-                assert(*end>0);
+                char* end = (char*)(p)+get_int_val(start);
+                assert(get_int_val(end)<0);
+                set_int_val(end,0-get_int_val(end));
+                assert(get_int_val(end)>0);
 
 		//check if left block is within array bounds
-                if(start>(int*)&a[3])
+                if(start>&a[3])
                 {
-                        int* left = (int*)((char*)(start)-4);
-                        if(*left>0)
+                        char* left = start-4;
+                        if(get_int_val(left)>0)
                                 coalesce(left,start);
                 }
 
 		//check if right block is within array bounds
-                if(end<(int*)&a[N-4])
+                if(end<&a[N-4])
                 {
-                        int* right = (int* )((char*) end +4);
-                        assert(*end>0); 
-                        if(*right>0)
+                        char* right = end +4;
+                        assert(get_int_val(end)>0); 
+                        if(get_int_val(right)>0)
                                 coalesce(end,right);
                 }
             assert(valid());}
@@ -269,22 +273,22 @@ void set_int_val(char* ptr, int a)
          * @param left:  pointer pointing to end sentinel of left block
          * joins 2 free blocks
          */
-        void coalesce (int* left, int* right)
+        void coalesce (char* left, char* right)
         {
-                int* ptr = left;
-                assert(*left>0);
-                assert(*right>0);
+                char* ptr = left;
+                assert(get_int_val(left)>0);
+                assert(get_int_val(right)>0);
                 //store new coalesced size
-                int new_size = *right + 8 + *left;
+                int new_size = get_int_val(right) + 8 + get_int_val(left);
 
                 //go to left start sentinel and change it to new size
-                ptr = (int*)((char*)ptr - *left -4);
-                *ptr = new_size;
+                ptr = ptr - get_int_val(left) -4;
+                set_int_val(ptr, new_size);
 
                 //go to right end sentinel and change it to new size
-                ptr = (int*)((char*)ptr+ *ptr +4);
-                assert(ptr==(int*)((char*)right+4+*right));
-                *ptr = new_size;
+                ptr = ptr+ get_int_val(ptr) +4;
+                assert(ptr==right+4+get_int_val(right));
+                set_int_val(ptr, new_size);
         }
         // -------
         // destroy
