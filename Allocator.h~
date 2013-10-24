@@ -126,6 +126,18 @@ class Allocator {
         // allocate
         // --------
 
+
+int get_int_val(char* ptr)
+{
+	return *reinterpret_cast<const int*>(ptr);
+}
+
+void set_int_val(char* ptr, int a)
+{
+	int* new_ptr = (int*)(ptr);
+	*new_ptr=a;
+}
+
         /**
          * O(1) in space
          * O(n) in time
@@ -134,8 +146,63 @@ class Allocator {
          * the smallest allowable block is sizeof(T) + (2 * sizeof(int))
          * choose the first block that fits
          */
+
         pointer allocate (size_type n) {
-            // <your code>
+	char* ptr=a;
+	int minblock =sizeof(T) + (2 * sizeof(int));
+    	int n_bytes = n*sizeof(T);
+
+	//search until empty sentinel
+	while(ptr<&a[N-4])
+	{
+		//ptr is pointing to left sentinel
+		//check if empty
+		int sent_val = get_int_val(ptr);
+		if(sent_val>=n_bytes+8)
+		{	
+			//check if free space left is enough to form another free block
+			if(sent_val>n_bytes+8+minblock)
+			{
+				int free_space = sent_val-n_bytes-8;
+				char* end = ptr+ sent_val+4;
+
+				//allocate block
+				//TODO create allocate_consec(ptr,n);
+				assert(n_bytes==sizeof(T)*n);
+				set_int_val(ptr,-n_bytes);
+				ptr=ptr+n_bytes+4;
+				set_int_val(ptr,-n_bytes);
+
+
+				//rest of the free space
+				set_int_val(end,free_space);
+				end=end-free_space-4;
+				set_int_val(end,free_space);
+				
+
+				return (pointer)(ptr-n_bytes);
+				
+			}
+			else
+			{
+				//allocate whole block
+				//TODO create a function to handle more than 1 obj
+				//allocate_consec(ptr,n);
+				int size =get_int_val(ptr);
+				set_int_val(ptr, 0-size);
+				set_int_val(ptr+size+4, 0-size);
+				return ((pointer)(ptr+4));
+			}
+		}
+		else
+		{
+			//block taken or block too small,move on to next block
+			ptr+=*ptr+8;
+		}
+		
+	}
+	//return NULL if no space
+	return NULL;
             assert(valid());
             return 0;}                   // replace!
 
@@ -164,11 +231,13 @@ class Allocator {
          */
         void deallocate (pointer p, size_type ) {
 
+		//save start position, negate start sentinel
                 int* start = (int*)((char*)(p)-4);
                 assert(*start<0);
                 *start =0-*start;
                 assert(*start>0);
 
+		//save end position, negate end sentinel
                 int* end = (int*)((char*)(p)+*start);
                 assert(*end<0);
                 *end =0-*end;
