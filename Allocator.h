@@ -91,7 +91,11 @@ class Allocator {
          * <your documentation>
          */
         Allocator () {
-            // <your code>
+            int* ptr = (int*)a;
+            *ptr = N-8;
+            ptr= (int*) (&a[N-1]-3);
+            *ptr = N-8;
+            //a= [N-8][........][N-8]
             assert(valid());}
 
         // Default copy, destructor, and copy assignment
