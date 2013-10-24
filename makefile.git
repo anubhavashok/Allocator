@@ -1,0 +1,20 @@
+cs:
+
+config:
+	git config -l
+
+count:
+	ls -al | grep "TestAllocator.c++" | wc
+	ls -al | grep "TestAllocator.out" | wc
+
+log:
+	git log
+
+pull:
+	git pull
+
+status:
+	git branch
+	git remote
+	git status
+
