@@ -54,12 +54,28 @@ class Allocator {
 
     private:
 	
-	
+	// -----
+        // get_int_val
+        // -----
+
+        /**
+         * returns int value of address location
+	 * @param ptr: character pointer to address location
+         */
 	int get_int_val(char* ptr)
 	{
 		return *reinterpret_cast<const int*>(ptr);
 	}
 
+	// -----
+        // set_int_val
+        // -----
+
+        /**
+         * set int value of address location
+	 * @param ptr: character pointer to address location
+	 * @param a: int containing value to be set
+         */
 	void set_int_val(char* ptr, int a)
 	{
 		int* new_ptr = (int*)(ptr);
@@ -82,27 +98,28 @@ class Allocator {
          * Checks if all sentinels match up
          */
         bool valid () const {
-            char* ptr=a;
-            while(ptr<&a[N-4])
+            int* ptr=(int*)a;
+            while(ptr<(int*)(&a[N-4]))
             {
-                printf("[%d][",get_int_val(ptr));
-                int size = abs(get_int_val(ptr));
-                ptr =ptr +size +4;
+                printf("[%d][",*ptr);
+                int size = abs(*ptr);
+                ptr =(int*)( (char* )ptr +size +4);
 
                 for(int i=0;i<size;i++)
                 {
                         printf(".");
                 }
-                printf("][%d]",get_int_val(ptr));
+                printf("][%d]",*ptr);
 
-                if(abs(get_int_val(ptr)) != size)
+                if(abs(*ptr) != size)
                 {
                         return false;
                 }
-                ptr=ptr+4;
+                ptr=(int*)((char*)ptr+4);
             }
             printf("\n");
             return true;}
+
 
         /**
          * O(1) in space
@@ -216,7 +233,7 @@ class Allocator {
         /**
          * O(1) in space
          * O(1) in time
-         * <your documentation>
+         * Creates an object of type T at address p
          */
         void construct (pointer p, const_reference v) {
             new (p) T(v);                               // this is correct and exempt

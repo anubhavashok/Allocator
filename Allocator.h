@@ -54,12 +54,28 @@ class Allocator {
 
     private:
 	
-	
+	// -----
+        // get_int_val
+        // -----
+
+        /**
+         * returns int value of address location
+	 * @param ptr: character pointer to address location
+         */
 	int get_int_val(char* ptr)
 	{
 		return *reinterpret_cast<const int*>(ptr);
 	}
 
+	// -----
+        // set_int_val
+        // -----
+
+        /**
+         * set int value of address location
+	 * @param ptr: character pointer to address location
+	 * @param a: int containing value to be set
+         */
 	void set_int_val(char* ptr, int a)
 	{
 		int* new_ptr = (int*)(ptr);
@@ -217,7 +233,7 @@ class Allocator {
         /**
          * O(1) in space
          * O(1) in time
-         * <your documentation>
+         * Creates an object of type T at address p
          */
         void construct (pointer p, const_reference v) {
             new (p) T(v);                               // this is correct and exempt
@@ -297,7 +313,7 @@ class Allocator {
         /**
          * O(1) in space
          * O(1) in time
-         * <your documentation>
+         * destroys object T at address p
          */
         void destroy (pointer p) {
             p->~T();               // this is correct
