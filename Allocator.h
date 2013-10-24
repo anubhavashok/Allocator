@@ -159,13 +159,64 @@ class Allocator {
         /**
          * O(1) in space
          * O(1) in time
-         * <your documentation>
-         * after deallocation adjacent free blocks must be coalesced
+	 * @param p: pointer to used block
+         * Deallocates used blocks and coalesces free blocks
          */
-        void deallocate (pointer p, size_type) {
-            // <your code>
-            assert(valid());}
+        void deallocate (pointer p, size_type ) {
 
+                int* start = (int*)((char*)(p)-4);
+                assert(*start<0);
+                *start =0-*start;
+                assert(*start>0);
+
+                int* end = (int*)((char*)(p)+*start);
+                assert(*end<0);
+                *end =0-*end;
+                assert(*end>0);
+
+                if(start>(int*)&a[3])
+                {
+                        int* left = (int*)((char*)(start)-4);
+                        if(*left>0)
+                                coalesce(left,start);
+                }
+
+
+                if(end<(int*)&a[N-4])
+                {
+                        //check right block
+                        int* right = (int* )((char*) end +4);
+                        assert(*end>0); //end should have free index
+                        if(*right>0)
+                                coalesce(end,right);
+                }
+            assert(valid());}
+        // ----------
+        // coalesce
+        // ----------
+
+        /**
+	 * @param right: pointer pointing to start sentinel of right block
+         * @param left:  pointer pointing to end sentinel of left block
+         * joins 2 free blocks
+         */
+        void coalesce (int* left, int* right)
+        {
+                int* ptr = left;
+                assert(*left>0);
+                assert(*right>0);
+                //store new coalesced size
+                int new_size = *right + 8 + *left;
+
+                //go to left start sentinel and change it to new size
+                ptr = (int*)((char*)ptr - *left -4);
+                *ptr = new_size;
+
+                //go to right end sentinel and change it to new size
+                ptr = (int*)((char*)ptr+ *ptr +4);
+                assert(ptr==(int*)((char*)right+4+*right));
+                *ptr = new_size;
+        }
         // -------
         // destroy
         // -------
