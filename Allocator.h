@@ -164,16 +164,19 @@ class Allocator {
          */
         void deallocate (pointer p, size_type ) {
 
+		//save start position, negate start sentinel
                 int* start = (int*)((char*)(p)-4);
                 assert(*start<0);
                 *start =0-*start;
                 assert(*start>0);
 
+		//save end position, negate end sentinel
                 int* end = (int*)((char*)(p)+*start);
                 assert(*end<0);
                 *end =0-*end;
                 assert(*end>0);
 
+		//check if left block is within array bounds
                 if(start>(int*)&a[3])
                 {
                         int* left = (int*)((char*)(start)-4);
@@ -181,12 +184,11 @@ class Allocator {
                                 coalesce(left,start);
                 }
 
-
+		//check if right block is within array bounds
                 if(end<(int*)&a[N-4])
                 {
-                        //check right block
                         int* right = (int* )((char*) end +4);
-                        assert(*end>0); //end should have free index
+                        assert(*end>0); 
                         if(*right>0)
                                 coalesce(end,right);
                 }

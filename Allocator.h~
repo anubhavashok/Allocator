@@ -159,7 +159,7 @@ class Allocator {
         /**
          * O(1) in space
          * O(1) in time
-	 * @param p: 
+	 * @param p: pointer to used block
          * Deallocates used blocks and coalesces free blocks
          */
         void deallocate (pointer p, size_type ) {
@@ -174,6 +174,7 @@ class Allocator {
                 *end =0-*end;
                 assert(*end>0);
 
+		//check if left block is within array bounds
                 if(start>(int*)&a[3])
                 {
                         int* left = (int*)((char*)(start)-4);
@@ -181,12 +182,11 @@ class Allocator {
                                 coalesce(left,start);
                 }
 
-
+		//check if right block is within array bounds
                 if(end<(int*)&a[N-4])
                 {
-                        //check right block
                         int* right = (int* )((char*) end +4);
-                        assert(*end>0); //end should have free index
+                        assert(*end>0); 
                         if(*right>0)
                                 coalesce(end,right);
                 }
