@@ -101,15 +101,10 @@ class Allocator {
             int* ptr=(int*)a;
             while(ptr<(int*)(&a[N-4]))
             {
-                printf("[%d][",*ptr);
+
                 int size = abs(*ptr);
                 ptr =(int*)( (char* )ptr +size +4);
 
-                for(int i=0;i<size;i++)
-                {
-                        printf(".");
-                }
-                printf("][%d]",*ptr);
 
                 if(abs(*ptr) != size)
                 {
@@ -117,7 +112,6 @@ class Allocator {
                 }
                 ptr=(int*)((char*)ptr+4);
             }
-            printf("\n");
             return true;}
 
 

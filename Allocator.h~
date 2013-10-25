@@ -263,7 +263,7 @@ class Allocator {
                 assert(get_int_val(end)>0);
 
 		//check if left block is within array bounds
-                if(start>&a[3])
+                if(start>&a[4])
                 {
                         char* left = start-4;
                         if(get_int_val(left)>0)
