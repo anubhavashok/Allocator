@@ -181,7 +181,7 @@ class Allocator {
 		if(sent_val>=n_bytes+8)
 		{	
 			//check if free space left is enough to form another free block
-			if(sent_val>n_bytes+8+minblock)
+			if(sent_val>=n_bytes+minblock)
 			{
 				int free_space = sent_val-n_bytes-8;
 				char* end = ptr+ sent_val+4;
@@ -199,7 +199,7 @@ class Allocator {
 				end=end-free_space-4;
 				set_int_val(end,free_space);
 				
-
+				assert(valid());
 				return (pointer)(ptr-n_bytes);
 				
 			}
@@ -211,18 +211,17 @@ class Allocator {
 				int size =get_int_val(ptr);
 				set_int_val(ptr, 0-size);
 				set_int_val(ptr+size+4, 0-size);
+				assert(valid());
 				return ((pointer)(ptr+4));
 			}
 		}
 		else
 		{
 			//block taken or block too small,move on to next block
-			ptr+=*ptr+8;
+			ptr+=abs(*ptr)+8;
 		}
 		
 	}
-	//return NULL if no space
-	return NULL;
             assert(valid());
             return 0;}                   // replace!
 
@@ -264,7 +263,7 @@ class Allocator {
                 assert(get_int_val(end)>0);
 
 		//check if left block is within array bounds
-                if(start>&a[3])
+                if(start>&a[4])
                 {
                         char* left = start-4;
                         if(get_int_val(left)>0)
@@ -272,7 +271,7 @@ class Allocator {
                 }
 
 		//check if right block is within array bounds
-                if(end<&a[N-4])
+                if(end<&a[N-3])
                 {
                         char* right = end +4;
                         assert(get_int_val(end)>0); 
